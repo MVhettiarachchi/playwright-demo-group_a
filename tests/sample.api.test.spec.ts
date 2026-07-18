@@ -1,50 +1,46 @@
-import { test, expect } from "@playwright/test";
-//Pass the token
-let token : string
+import { test, expect, type APIRequestContext } from "@playwright/test";
+
+let requestContext: APIRequestContext;
+let token: string;
+
+// SQA Practice: Destructure 'playwright' to safely instantiate a new context inline
+test.beforeEach(async ({ playwright }) => {
+  requestContext = await playwright.request.newContext({
+    baseURL: 'http://75.119.154.239/api/'
+  });
+});
+
 test.describe('Sample API', () => {
-  test('login with valid credentials', async ({ request }) => {
+  test('login with valid credentials', async () => {
     const requestBody = {
       "identifier": "groupa",
       "password": "123456",
       "portal": "admin"
     };
 
-    // Make the API call using the requestBody payload
-    const response = await request.post('http://75.119.154.239/api/auth/login', { 
+    const response = await requestContext.post('auth/login', { 
       data: requestBody
     });
 
-    // Assert and parse the response
     expect(response.status()).toBe(200);
     const responseBody = await response.json();
-    
-    // Save the token to the global variable
     token = responseBody.token;
-
-    // Check response data/token in the console
-    console.log(responseBody.token);
+    console.log("Token successfully captured:", token);
   });
 });
 
+test.describe('Sample API - profile management', () => {
+  test('profile management', async () => {
+    expect(token).toBeDefined();
 
-
-test.describe('Sample API -profile management', () => {
-  test('profile management', async ({ request }) => {
-
-
-    // Make the API call using the requestBody payload
-    const response = await request.get('http://75.119.154.239/api/admin/profile', { 
+    const response = await requestContext.get('admin/profile', { 
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
-    // Assert and parse the response
     expect(response.status()).toBe(200);
     const responseBody = await response.json();
-    
-    console.log("User Details:", responseBody);
-
     expect(responseBody.profile.username).toEqual('groupa');
   });
 });
