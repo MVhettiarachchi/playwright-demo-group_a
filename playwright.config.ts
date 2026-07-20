@@ -6,4 +6,4 @@ export default defineConfig({
   workers: 1,
   timeout: 30000,
   fullyParallel: false
-});
+});  
