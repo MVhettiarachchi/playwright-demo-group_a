@@ -20,4 +20,13 @@ export class ApiClient {
       }
     });
   }
+
+  async createUser(token: string, userData: object) {
+    return await this.requestContext.post('admin/users', { 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      data: userData 
+    });
+  }
 }
