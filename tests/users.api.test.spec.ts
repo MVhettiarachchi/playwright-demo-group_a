@@ -13,9 +13,12 @@ test.describe('Users API - List Users', () => {
 
     // Call users endpoint
     const usersResponse = await apiClient.getUsers(token);
+    // 1) Validate status and parse JSON
     const usersBody = await ApiHelper.validateAndParse(usersResponse, 200);
 
-    // Basic assertions about returned structure
-    expect(Array.isArray(usersBody.users) || Array.isArray(usersBody)).toBeTruthy();
+    // 2) Structural and content validations using reusable helpers
+    // - ensures `users`, `stats`, and `userLevels` exist and are arrays
+    // - validates keys on first element when arrays are non-empty
+    ApiHelper.validateUsersResponse(usersBody);
   });
 });
