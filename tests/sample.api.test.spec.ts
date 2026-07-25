@@ -1,7 +1,7 @@
 import { test, expect } from "../src/fixtures/api_fixture.js";
 import { API_CONFIG } from "../src/config/config.js";
 import { AppState } from "../src/environment/state.js";
-import { ApiHelper } from "../helper/api_helper.js";
+import { ApiHelper } from "../src/helper/api_helper.js";
 
 test.describe('Sample API - Authentication', () => {
   test('login with valid credentials', async ({ apiClient }) => {
