@@ -6,8 +6,8 @@ import { ApiHelper } from "../src/helper/api_helper.js";
 test.describe.configure({ mode: 'serial' });
 
 test.describe('User Deactivation API Tests', () => {
-  let targetUserId = 'testing-25';
-  let targetUsername = 'testing-25';
+  let targetUserId = 'USR-ADM-0123';
+  let targetUsername = 'emma';
   let allUsers: any[] = [];
 
   // TC-01: Login and GET all users
@@ -28,7 +28,7 @@ test.describe('User Deactivation API Tests', () => {
 
     // Verify target user 'testing-25' exists
     const testingUser = allUsers.find(
-      (u: any) => u.user_id === 'testing-25' || u.username === 'testing-25'
+      (u: any) => u.user_id === 'USR-ADM-0123' || u.username === 'emma'
     );
 
     if (testingUser) {
@@ -36,7 +36,7 @@ test.describe('User Deactivation API Tests', () => {
       targetUsername = testingUser.username ?? testingUser.displayName;
       console.log(`Found target user: ${targetUsername} (ID: ${targetUserId})`);
     } else {
-      console.log("Warning: User 'testing-25' not found in GET users list. Falling back to default ID.");
+      console.log("Warning: User 'emma' not found in GET users list. Falling back to default ID.");
     }
   });
 
