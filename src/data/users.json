@@ -1,0 +1,14 @@
+{
+  "emma": {
+    "displayName": "Emma",
+    "personalEmail": "madushikasewwandi971@gmail.com",
+    "nic": "5678782728v",
+    "mobile": "0763298988"
+  },
+  "john": {
+    "displayName": "John Doe",
+    "personalEmail": "john.doe@example.com",
+    "nic": "123456789v",
+    "mobile": "0763298988"
+  }
+}
