@@ -46,9 +46,6 @@ export class ApiClient {
     });
   }
 
-  async getAllUsers(token: string) {
-    return await this.requestContext.get('admin/users', { 
-//list users - the method added to call the endpoint from your curl.
   async getUsers(token: string) {
     return await this.requestContext.get('admin/users', {
       headers: {

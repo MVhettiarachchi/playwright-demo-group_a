@@ -1,32 +1,33 @@
 import { test, expect } from "../src/fixtures/api_fixture.js";
 import { API_CONFIG } from "../src/config/config.js";
-import { AppState } from "../src/environment/state.js";
 import { ApiHelper } from "../src/helper/api_helper.js";
 
 test.describe.configure({ mode: 'serial' });
 
 test.describe('User Deactivation API Tests', () => {
+  let token: string;
   let targetUserId = 'USR-ADM-0123';
   let targetUsername = 'emma';
   let allUsers: any[] = [];
 
-  // TC-01: Login and GET all users
-  test('TC-01: Should GET all users successfully after login', async ({ apiClient }) => {
-    // Authenticate
+  // Authenticate once before running the serial suite
+  test.beforeAll(async ({ apiClient }) => {
     const loginRes = await apiClient.login(API_CONFIG.credentials);
     const loginBody = await ApiHelper.validateAndParse(loginRes, 200);
-    AppState.token = loginBody.token;
-    expect(AppState.token).toBeDefined();
-    console.log("Token captured and saved in AppState.");
+    token = loginBody.token;
+    console.log("Token successfully captured for serial test execution.");
+  });
 
-    // Retrieve all users
-    const response = await apiClient.getAllUsers(AppState.token);
+  // TC-01: GET all users
+  test('TC-01: Should GET all users successfully after login', async ({ apiClient }) => {
+    const response = await apiClient.getUsers(token);  
     const body = await ApiHelper.validateAndParse(response, 200);
     allUsers = body.users ?? body.data ?? body;
+    
     expect(Array.isArray(allUsers)).toBeTruthy();
     console.log(`Total users found in system: ${allUsers.length}`);
 
-    // Verify target user 'testing-25' exists
+    // Verify target user 'emma' exists
     const testingUser = allUsers.find(
       (u: any) => u.user_id === 'USR-ADM-0123' || u.username === 'emma'
     );
@@ -54,10 +55,9 @@ test.describe('User Deactivation API Tests', () => {
 
   // TC-03: DEACTIVATE the user
   test('TC-03: Should DEACTIVATE the user', async ({ apiClient }) => {
-    expect(AppState.token).toBeDefined();
     console.log(`Deactivating user: ${targetUsername} (ID: ${targetUserId})`);
 
-    const response = await apiClient.updateUserStatus(AppState.token, targetUserId, 'inactive');
+    const response = await apiClient.updateUserStatus(token, targetUserId, 'inactive');
     const body = await ApiHelper.validateAndParse(response, 200);
 
     expect(body.message).toContain('User deactivated');
@@ -66,10 +66,9 @@ test.describe('User Deactivation API Tests', () => {
 
   // TC-03b: Deactivate the user again when they are already inactive
   test('TC-03b: Should check behavior when deactivating an already deactivated user', async ({ apiClient }) => {
-    expect(AppState.token).toBeDefined();
     console.log(`Attempting second deactivation for user: ${targetUsername} (ID: ${targetUserId})`);
 
-    const response = await apiClient.updateUserStatus(AppState.token, targetUserId, 'inactive');
+    const response = await apiClient.updateUserStatus(token, targetUserId, 'inactive');
     console.log(`Second deactivation response status: ${response.status()}`);
     
     try {
@@ -82,8 +81,7 @@ test.describe('User Deactivation API Tests', () => {
 
   // TC-04: VERIFY user is now INACTIVE
   test('TC-04: Should VERIFY user is now INACTIVE', async ({ apiClient }) => {
-    expect(AppState.token).toBeDefined();
-    const response = await apiClient.getAllUsers(AppState.token);
+    const response = await apiClient.getUsers(token);
     const body = await ApiHelper.validateAndParse(response, 200);
     const users = body.users ?? body.data ?? body;
 
@@ -95,10 +93,9 @@ test.describe('User Deactivation API Tests', () => {
 
   // TC-05: RE-ACTIVATE the user (cleanup)
   test('TC-05: Should RE-ACTIVATE the user (cleanup)', async ({ apiClient }) => {
-    expect(AppState.token).toBeDefined();
     console.log(`Re-activating user: ${targetUsername} (ID: ${targetUserId})`);
 
-    const response = await apiClient.updateUserStatus(AppState.token, targetUserId, 'active');
+    const response = await apiClient.updateUserStatus(token, targetUserId, 'active');
     const body = await ApiHelper.validateAndParse(response, 200);
 
     expect(body.message).toContain('User activated');
@@ -107,8 +104,7 @@ test.describe('User Deactivation API Tests', () => {
 
   // TC-06: VERIFY user is back to ACTIVE
   test('TC-06: Should VERIFY user is back to ACTIVE', async ({ apiClient }) => {
-    expect(AppState.token).toBeDefined();
-    const response = await apiClient.getAllUsers(AppState.token);
+    const response = await apiClient.getUsers(token);
     const body = await ApiHelper.validateAndParse(response, 200);
     const users = body.users ?? body.data ?? body;
 
