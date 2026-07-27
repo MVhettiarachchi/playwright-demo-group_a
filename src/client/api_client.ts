@@ -1,4 +1,5 @@
 import { type APIRequestContext } from "@playwright/test";
+import { API_CONFIG } from "../config/config.js";
 
 export class ApiClient {
   protected requestContext: APIRequestContext;
@@ -19,6 +20,21 @@ export class ApiClient {
         'Authorization': `Bearer ${token}`
       }
     });
+  }
+
+  // Active User
+  async activeUser(userId: string, token: string) {
+
+    return await this.requestContext.patch(
+      `admin/users/${userId}/status`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+
+        data: API_CONFIG.activeUserPayload
+      }
+    );
   }
 
   async createUser(token: string, userData: object) {

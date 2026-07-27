@@ -4,5 +4,10 @@ export const API_CONFIG = {
     identifier: "groupa",
     password: "123456",
     portal: "admin"
+  },
+
+  activeUserPayload: {
+    status: "active"
   }
+  
 };
