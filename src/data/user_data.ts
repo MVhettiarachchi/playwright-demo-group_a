@@ -15,3 +15,17 @@ export const createUserData = (userKey: keyof typeof userDataJson = "emma", over
     ...override
   };
 };
+
+// src/data/user_data.ts
+
+export const UPDATE_USER_DATA = {
+  payload: {
+    userLevelCode: "admin_user",
+    username: "updated_user",
+    password: "",
+    displayName: "Updated Display Name",
+    personalEmail: "updated_email@example.com",
+    mobile: "0763298988",
+    nic: "5678782128v"
+  }
+};

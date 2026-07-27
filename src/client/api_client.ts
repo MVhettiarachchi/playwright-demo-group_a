@@ -62,4 +62,14 @@ export class ApiClient {
       data: { status }
     });
   }
+
+  async updateUser(token: string, userId: string, userData: Record<string, any>) {
+  return await this.requestContext.put(`admin/users/${userId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    data: userData
+  });
+}
 }
