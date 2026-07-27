@@ -2,7 +2,7 @@ import { type APIRequestContext } from "@playwright/test";
 import { API_CONFIG } from "../config/config.js";
 
 export class ApiClient {
-  private requestContext: APIRequestContext;
+  protected requestContext: APIRequestContext;
 
   constructor(requestContext: APIRequestContext) {
     this.requestContext = requestContext;
@@ -37,4 +37,32 @@ export class ApiClient {
     );
   }
 
+  async createUser(token: string, userData: object) {
+    return await this.requestContext.post('admin/users', { 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      data: userData 
+    });
+  }
+
+  async getAllUsers(token: string) {
+    return await this.requestContext.get('admin/users', { 
+//list users - the method added to call the endpoint from your curl.
+  async getUsers(token: string) {
+    return await this.requestContext.get('admin/users', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
+  async updateUserStatus(token: string, userId: string, status: 'active' | 'inactive') {
+    return await this.requestContext.patch(`admin/users/${userId}/status`, { 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      data: { status }
+    });
+  }
 }
