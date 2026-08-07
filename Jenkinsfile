@@ -1,6 +1,9 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS-20'
+
     stages {
         stage('Checkout') {
             steps {
@@ -29,22 +32,6 @@ pipeline {
                         bat 'npx playwright test'
                     }
                 }
-            }
-        }
-    }
-
-    post {
-        always {
-            // Optional: Publish HTML Report if HTML Publisher plugin is installed on Linux
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                publishHTML(target: [
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright HTML Report'
-                ])
             }
         }
     }
