@@ -3,6 +3,7 @@ pipeline {
 
     tools {
         nodejs 'NodeJS-20'
+    }
 
     stages {
         stage('Checkout') {
@@ -32,6 +33,21 @@ pipeline {
                         bat 'npx playwright test'
                     }
                 }
+            }
+        }
+    }
+
+    post {
+        always {
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                publishHTML(target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright HTML Report'
+                ])
             }
         }
     }
