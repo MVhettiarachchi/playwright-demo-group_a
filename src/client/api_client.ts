@@ -72,4 +72,26 @@ export class ApiClient {
     data: userData
   });
 }
+
+// GET /api/admin/exams
+  async getExams(token: string) {
+    return await this.requestContext.get('admin/exams', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': '*/*'
+      }
+    });
+  }
+
+  // POST /api/admin/exams
+  async createExam(token: string, payload: object) {
+    return await this.requestContext.post('admin/exams', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': '*/*'
+      },
+      data: payload
+    });
+  }
 }
