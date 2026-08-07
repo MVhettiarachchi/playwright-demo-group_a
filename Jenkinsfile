@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS-20'
+        nodejs 'NodeJS'
     }
 
     stages {
@@ -16,9 +16,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'npm ci'
+                        sh 'npm install'
                     } else {
-                        bat 'npm ci'
+                        bat 'npm install'
                     }
                 }
             }
