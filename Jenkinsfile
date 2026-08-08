@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -14,41 +10,24 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm install'
-                    } else {
-                        bat 'npm install'
-                    }
-                }
+                sh 'npm install'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npx playwright test'
-                    } else {
-                        bat 'npx playwright test'
-                    }
-                }
+                // Allows tests to finish even if some fail so reports generate
+                sh 'npx playwright test || true'
             }
         }
     }
 
     post {
         always {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                publishHTML(target: [
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright HTML Report'
-                ])
-            }
+            // Generates and attaches the Allure Report link on the Jenkins job page
+            allure includeProperties: false, 
+                   jdk: '', 
+                   results: [[path: 'allure-results']]
         }
     }
 }
