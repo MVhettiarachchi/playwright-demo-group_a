@@ -1,34 +1,20 @@
-/*
-import { test, expect } from "../src/fixtures/api_fixture.js";
-import { API_CONFIG } from "../src/config/config.js";
-import { ApiHelper } from "../src/helper/api_helper.js";
-import { AppState } from "../src/environment/state.js";
-import { bulkUploadData } from "../src/data/exam_marks_data.js";
-import { ExcelHelper } from "../src/helper/excel_helper.js";
+import { test, expect } from "@fixtures/api_fixture";
+import { API_CONFIG } from "@environment/environment.config";
+import { bulkUploadData } from "@data/exam_marks_data";
+import { ExcelHelper } from "@helper/excel_helper";
 
-test.describe('POST /api/admin/exam-marks/import - Bulk Upload Test Suite', () => {
+test.describe.serial('POST /api/admin/exam-marks/import - Bulk Upload Test Suite', () => {
+  let token: string;
 
-  test.beforeAll(async ({ apiClient }) => {
-    const response = await apiClient.login(API_CONFIG.credentials);
-    const body = await ApiHelper.validateAndParse(response, 200);
-    AppState.token = body.token || body.data?.token;
-    expect(AppState.token).toBeTruthy();
+  test('1. Login and capture token', async ({ authClient }) => {
+    const response = await authClient.login(API_CONFIG.credentials);
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    token = body.token || body.data?.token;
   });
 
-  test('Bulk Upload - TC01: Successfully perform bulk upload using ExcelHelper buffer', async ({ apiClient }) => {
-    const excelBuffer = ExcelHelper.generateExcelBuffer(bulkUploadData.bulkStudentsList);
-
-    const uploadPayload = {
-      ...bulkUploadData.defaultParams,
-      fileBuffer: excelBuffer,
-      fileName: `bulk-upload-exam-marks-${Date.now()}.xlsx`
-    };
-
-    const response = await apiClient.importExamMarks(AppState.token, uploadPayload);
-    expect([200, 201]).toContain(response.status());
-  });
-
-  test('Bulk Upload - TC02: Fail bulk upload when required query parameter (examTypeCode) is missing', async ({ apiClient }) => {
+  test('Bulk Upload - TC02: Fail bulk upload when required query parameter (examTypeCode) is missing', async ({ examClient }) => {
     const excelBuffer = ExcelHelper.generateExcelBuffer(bulkUploadData.bulkStudentsList);
 
     const invalidPayload = {
@@ -38,11 +24,11 @@ test.describe('POST /api/admin/exam-marks/import - Bulk Upload Test Suite', () =
       fileName: 'bulk-upload-missing-type.xlsx'
     };
 
-    const response = await apiClient.importExamMarks(AppState.token, invalidPayload);
+    const response = await examClient.importExamMarks(token, invalidPayload);
     expect([400, 422]).toContain(response.status());
   });
 
-  test('Bulk Upload - TC03: Fail bulk upload when sending corrupted non-Excel binary data', async ({ apiClient }) => {
+  test('Bulk Upload - TC03: Fail bulk upload when sending corrupted non-Excel binary data', async ({ examClient }) => {
     const corruptedBuffer = ExcelHelper.generateCorruptedBuffer();
 
     const invalidPayload = {
@@ -51,9 +37,7 @@ test.describe('POST /api/admin/exam-marks/import - Bulk Upload Test Suite', () =
       fileName: 'bulk-upload-invalid-format.xlsx'
     };
 
-    const response = await apiClient.importExamMarks(AppState.token, invalidPayload);
+    const response = await examClient.importExamMarks(token, invalidPayload);
     expect([400, 422, 500]).toContain(response.status());
   });
-
 });
-*/

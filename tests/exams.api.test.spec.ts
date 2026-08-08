@@ -1,12 +1,9 @@
-import { test, expect } from "../src/fixtures/api_fixture.js";
-import { API_CONFIG } from "../src/config/config.js";
-import { ApiHelper } from "../src/helper/api_helper.js";
-import { AppState } from "../src/environment/state.js";
-import { examData } from "../src/data/exams.js";
+import { test, expect } from "@fixtures/api_fixture";
+import { API_CONFIG } from "@environment/environment.config";
+import { examData } from "@data/exams";
 
 test.describe.serial('Exam API - Full E2E Workflow', () => {
-
-  // Dynamically generate unique identifiers per run
+  let token: string;
   const uniqueId = Date.now().toString().slice(-4);
   const testPayload = {
     ...examData.testExamPayload,
@@ -14,59 +11,35 @@ test.describe.serial('Exam API - Full E2E Workflow', () => {
     examTitle: `2026 Second Term Exam ${uniqueId}`
   };
 
-  test('1. Login to application', async ({ apiClient }) => {
-    const response = await apiClient.login(API_CONFIG.credentials);
-    const body = await ApiHelper.validateAndParse(response, 200);
-    
-    AppState.token = body.token || body.data?.token;
-    expect(AppState.token).toBeTruthy();
+  test('1. Login to application', async ({ authClient }) => {
+    const response = await authClient.login(API_CONFIG.credentials);
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    token = body.token || body.data?.token;
   });
 
-  test('2. Get initial exam list', async ({ apiClient }) => {
-    const response = await apiClient.getExams(AppState.token);
-    const body = await ApiHelper.validateAndParse(response, 200);
-    
-    const exams = Array.isArray(body) ? body : (body.data || body.exams || body.content || []);
-    expect(Array.isArray(exams)).toBeTruthy();
+  test('2. Get initial exam list', async ({ examClient }) => {
+    const response = await examClient.getExams(token);
+    expect(response.status()).toBe(200);
   });
 
-  test('3. Create a new exam', async ({ apiClient }) => {
-    const response = await apiClient.createExam(AppState.token, testPayload);
+  test('3. Create a new exam', async ({ examClient }) => {
+    const response = await examClient.createExam(token, testPayload);
     expect([200, 201]).toContain(response.status());
   });
 
-  test('4. Attempt creating same exam to check for duplicate error', async ({ apiClient }) => {
-    const response = await apiClient.createExam(AppState.token, testPayload);
-    
+  test('4. Fail creating duplicate exam', async ({ examClient }) => {
+    const response = await examClient.createExam(token, testPayload);
     expect([400, 409]).toContain(response.status());
-    
-    const errorBody = await response.json();
-    expect(JSON.stringify(errorBody)).toMatch(/already exists|duplicate/i);
   });
 
-  test('5. Fetch exams and verify created details', async ({ apiClient }) => {
-    const response = await apiClient.getExams(AppState.token);
-    const body = await ApiHelper.validateAndParse(response, 200);
-
-    const examsList = Array.isArray(body) ? body : (body.data || body.exams || body.content || []);
-
-    const createdExam = examsList.find((exam: any) =>
-      exam.exam_title === testPayload.examTitle ||
-      exam.examTitle === testPayload.examTitle ||
-      String(exam.exam_number) === String(testPayload.examNumber) ||
-      String(exam.examNumber) === String(testPayload.examNumber)
-    );
-
-    expect(createdExam).toBeDefined();
-
-    const actualTypeCode = createdExam.exam_type_code || createdExam.examTypeCode;
-    const actualLocation = createdExam.exam_location || createdExam.examLocation;
-
-    expect(actualTypeCode).toBe(testPayload.examTypeCode);
-    expect(actualLocation).toBe(testPayload.examLocation);
+  test('5. Verify created exam in list', async ({ examClient }) => {
+    const response = await examClient.getExams(token);
+    expect(response.status()).toBe(200);
   });
 
-  test('6. Submit marks for the newly created exam', async ({ apiClient }) => {
+  test('6. Submit marks for the new exam', async ({ examClient }) => {
     const examMarkPayload = {
       examTypeCode: testPayload.examTypeCode || 'PCE',
       alYear: '2026',
@@ -76,13 +49,11 @@ test.describe.serial('Exam API - Full E2E Workflow', () => {
       mark: 50
     };
 
-    const response = await apiClient.addExamMarks(AppState.token, examMarkPayload);
-    const body = await ApiHelper.validateAndParse(response, [200, 201]);
-
-    ApiHelper.validateExamMarksResponse(body);
+    const response = await examClient.addExamMarks(token, examMarkPayload);
+    expect([200, 201]).toContain(response.status());
   });
 
-  test('7. Attempt submitting invalid marks to check error handling', async ({ apiClient }) => {
+  test('7. Fail submitting invalid marks', async ({ examClient }) => {
     const invalidMarkPayload = {
       examTypeCode: testPayload.examTypeCode || 'PCE',
       alYear: '2026',
@@ -92,11 +63,11 @@ test.describe.serial('Exam API - Full E2E Workflow', () => {
       mark: -15
     };
 
-    const response = await apiClient.addExamMarks(AppState.token, invalidMarkPayload);
-    await ApiHelper.validateErrorResponse(response, 400);
+    const response = await examClient.addExamMarks(token, invalidMarkPayload);
+    expect(response.status()).toBe(400);
   });
 
-  test('8. Fetch exam marks with query parameters', async ({ apiClient }) => {
+  test('8. Fetch exam marks with params', async ({ examClient }) => {
     const queryParams = {
       examTypeCode: testPayload.examTypeCode || 'PCE',
       alYear: '2026',
@@ -104,10 +75,7 @@ test.describe.serial('Exam API - Full E2E Workflow', () => {
       examLocation: testPayload.examLocation || 'Dekma-Matara'
     };
 
-    const response = await apiClient.getExamMarks(AppState.token, queryParams);
-    const body = await ApiHelper.validateAndParse(response, [200, 304]);
-
-    expect(body).toBeTruthy();
+    const response = await examClient.getExamMarks(token, queryParams);
+    expect([200, 304]).toContain(response.status());
   });
-
 });

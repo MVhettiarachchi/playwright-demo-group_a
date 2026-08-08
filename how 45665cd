@@ -1,0 +1,33 @@
+[33mcommit 45665cd7f5f74ee032aa5d9af3da5bf9f2051358[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/Ravindu[m[33m, [m[1;31morigin/Kruthi[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: madhushika <madushikasewwandi971@gmail.com>
+Date:   Mon Jul 27 16:39:55 2026 +0530
+
+    chore: save local updates and test fixes
+
+[33mcommit b7048eca4d341a11e22110e99e4cd90ce80b6104[m
+Author: madhushika <madushikasewwandi971@gmail.com>
+Date:   Mon Jul 27 16:36:35 2026 +0530
+
+    chore: save local updates and test fixes
+
+[33mcommit 53c3939f9bbe1160515d10410bb34b3a294c568b[m
+Merge: 36ea077 38f1f28
+Author: Madhu Hettiarachchige <49018097+MVhettiarachchi@users.noreply.github.com>
+Date:   Mon Jul 27 16:35:22 2026 +0530
+
+    Merge pull request #4 from MVhettiarachchi/chalani
+    
+    active user
+
+[33mcommit 38f1f28b07e3a2c4372cd92f9f40ea4d81352b42[m[33m ([m[1;31morigin/chalani[m[33m)[m
+Merge: 6d673c3 36ea077
+Author: Madhu Hettiarachchige <49018097+MVhettiarachchi@users.noreply.github.com>
+Date:   Mon Jul 27 16:13:36 2026 +0530
+
+    Merge branch 'main' into chalani
+
+[33mcommit 6d673c36ce873325f88c7f0c0a8e591559a6f9c8[m
+Author: chalani madurangi <chalanimadurangi98@gmail.com>
+Date:   Sat Jul 25 17:18:03 2026 +0530
+
+    active user

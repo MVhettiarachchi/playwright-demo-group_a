@@ -1,28 +1,31 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig } from '@playwright/test';
+import { API_CONFIG } from '@environment/environment.config';
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: './tests',
+  workers: 1,
+  timeout: 30000,
+  fullyParallel: false,
+
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
     [
       'allure-playwright',
       {
-        resultsDir: 'allure-results', // MUST be resultsDir in allure-playwright v3
+        resultsDir: 'allure-results',
         detail: true,
         suiteTitle: false,
       },
     ],
   ],
-  workers: 1,
-  timeout: 30000,
-  fullyParallel: false,
+
   use: {
-    baseURL: 'http://75.119.154.239/api/',
+    baseURL: API_CONFIG.baseURL,
     trace: 'on',
     extraHTTPHeaders: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  }
+      'Content-Type': 'application/json',
+    },
+  },
 });

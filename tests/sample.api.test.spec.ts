@@ -1,30 +1,26 @@
-import { test, expect } from "../src/fixtures/api_fixture.js";
-import { API_CONFIG } from "../src/config/config.js";
-import { ApiHelper } from "../src/helper/api_helper.js";
+import { test, expect } from "@fixtures/api_fixture";
+import { API_CONFIG } from "@environment/environment.config";
 
 test.describe('Sample API - Profile Management', () => {
   let token: string;
 
-  // Automatically authenticate before each test
-  test.beforeEach(async ({ apiClient }) => {
-    const response = await apiClient.login(API_CONFIG.credentials);
-    const responseBody = await ApiHelper.validateAndParse(response, 200);
-    token = responseBody.token;
+  test.beforeEach(async ({ authClient }) => {
+    const response = await authClient.login(API_CONFIG.credentials);
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    token = body.token;
   });
 
-  test('login with valid credentials', async () => {
+  test('Verify token acquired', async () => {
     expect(token).toBeDefined();
-    console.log("Token successfully acquired via beforeEach setup.");
   });
 
-  test('profile management', async ({ apiClient }) => {
-    // 1. Action handled by Client
-    const response = await apiClient.getProfile(token);
-    
-    // 2. Utility handled by Helper
-    const responseBody = await ApiHelper.validateAndParse(response, 200);
-    
-    // 3. Assertion
-    expect(responseBody.profile.username).toEqual(API_CONFIG.credentials.identifier);
+  test('Get user profile', async ({ authClient }) => {
+    const response = await authClient.getProfile(token);
+    expect(response.status()).toBe(200);
+
+    const body = await response.json();
+    expect(body.profile.username).toBe(API_CONFIG.credentials.identifier);
   });
 });

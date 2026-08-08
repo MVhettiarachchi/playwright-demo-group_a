@@ -1,17 +1,31 @@
-import { test as base } from "@playwright/test";
-import { ApiClient } from "../client/api_client.js";
+import { test as base } from '@playwright/test';
+import { ApiClient } from '@client/api_client';
+import { AuthClient } from '@client/auth_client';
+import { UserClient } from '@client/user_client';
+import { ExamClient } from '@client/exam_client';
 
-// Define fixtures type
-type MyFixtures = {
+// 1. Define custom fixture types for Playwright
+type ApiFixtures = {
   apiClient: ApiClient;
+  authClient: AuthClient;
+  userClient: UserClient;
+  examClient: ExamClient;
 };
 
-// Extend base test with just the apiClient
-export const test = base.extend<MyFixtures>({
+// 2. Extend base test with all your API client instances
+export const test = base.extend<ApiFixtures>({
   apiClient: async ({ request }, use) => {
-    const client = new ApiClient(request);
-    await use(client);
+    await use(new ApiClient(request));
+  },
+  authClient: async ({ request }, use) => {
+    await use(new AuthClient(request));
+  },
+  userClient: async ({ request }, use) => {
+    await use(new UserClient(request));
+  },
+  examClient: async ({ request }, use) => {
+    await use(new ExamClient(request));
   },
 });
 
-export { expect } from "@playwright/test";
+export { expect } from '@playwright/test';
