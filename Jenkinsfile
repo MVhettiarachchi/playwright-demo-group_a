@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS-20' // Must match the name configured in Jenkins Tools
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -16,7 +20,6 @@ pipeline {
 
         stage('Run Playwright Tests') {
             steps {
-                // Allows tests to finish even if some fail so reports generate
                 sh 'npx playwright test || true'
             }
         }
@@ -24,7 +27,6 @@ pipeline {
 
     post {
         always {
-            // Generates and attaches the Allure Report link on the Jenkins job page
             allure includeProperties: false, 
                    jdk: '', 
                    results: [[path: 'allure-results']]
