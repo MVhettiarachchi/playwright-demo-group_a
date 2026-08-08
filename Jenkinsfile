@@ -2,7 +2,11 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS' // Matches the existing NodeJS tool name in your Jenkins setup
+        nodejs 'NodeJS'
+    }
+
+    environment {
+        ALLURE_RESULTS_DIR = 'allure-results'
     }
 
     stages {
@@ -20,7 +24,10 @@ pipeline {
 
         stage('Run Playwright Tests') {
             steps {
+                sh 'rm -rf allure-results'
+                sh 'mkdir -p allure-results'
                 sh 'npx playwright test || true'
+                sh 'ls -la allure-results'
             }
         }
     }
