@@ -5,10 +5,6 @@ pipeline {
         nodejs 'NodeJS'
     }
 
-    environment {
-        ALLURE_RESULTS_DIR = 'allure-results'
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -26,7 +22,8 @@ pipeline {
             steps {
                 sh 'rm -rf allure-results'
                 sh 'mkdir -p allure-results'
-                sh 'npx playwright test || true'
+                // Explicitly pass the allure-playwright reporter
+                sh 'npx playwright test --reporter=line,allure-playwright || true'
                 sh 'ls -la allure-results'
             }
         }
