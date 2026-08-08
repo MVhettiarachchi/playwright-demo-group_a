@@ -50,7 +50,6 @@ test.describe.serial('Exam API - Full E2E Workflow', () => {
 
     const examsList = Array.isArray(body) ? body : (body.data || body.exams || body.content || []);
 
-    // Check both camelCase and snake_case properties
     const createdExam = examsList.find((exam: any) =>
       exam.exam_title === testPayload.examTitle ||
       exam.examTitle === testPayload.examTitle ||
@@ -60,12 +59,55 @@ test.describe.serial('Exam API - Full E2E Workflow', () => {
 
     expect(createdExam).toBeDefined();
 
-    // Map snake_case and camelCase field accessors
     const actualTypeCode = createdExam.exam_type_code || createdExam.examTypeCode;
     const actualLocation = createdExam.exam_location || createdExam.examLocation;
 
     expect(actualTypeCode).toBe(testPayload.examTypeCode);
     expect(actualLocation).toBe(testPayload.examLocation);
+  });
+
+  test('6. Submit marks for the newly created exam', async ({ apiClient }) => {
+    const examMarkPayload = {
+      examTypeCode: testPayload.examTypeCode || 'PCE',
+      alYear: '2026',
+      examNumber: String(testPayload.examNumber),
+      examLocation: testPayload.examLocation || 'Dekma-Matara',
+      studentId: 'STU-KNS',
+      mark: 50
+    };
+
+    const response = await apiClient.addExamMarks(AppState.token, examMarkPayload);
+    const body = await ApiHelper.validateAndParse(response, [200, 201]);
+
+    ApiHelper.validateExamMarksResponse(body);
+  });
+
+  test('7. Attempt submitting invalid marks to check error handling', async ({ apiClient }) => {
+    const invalidMarkPayload = {
+      examTypeCode: testPayload.examTypeCode || 'PCE',
+      alYear: '2026',
+      examNumber: String(testPayload.examNumber),
+      examLocation: testPayload.examLocation || 'Dekma-Matara',
+      studentId: 'STU-KNS',
+      mark: -15
+    };
+
+    const response = await apiClient.addExamMarks(AppState.token, invalidMarkPayload);
+    await ApiHelper.validateErrorResponse(response, 400);
+  });
+
+  test('8. Fetch exam marks with query parameters', async ({ apiClient }) => {
+    const queryParams = {
+      examTypeCode: testPayload.examTypeCode || 'PCE',
+      alYear: '2026',
+      examNumber: String(testPayload.examNumber),
+      examLocation: testPayload.examLocation || 'Dekma-Matara'
+    };
+
+    const response = await apiClient.getExamMarks(AppState.token, queryParams);
+    const body = await ApiHelper.validateAndParse(response, [200, 304]);
+
+    expect(body).toBeTruthy();
   });
 
 });

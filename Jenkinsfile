@@ -14,7 +14,8 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                // Ensure devDependencies (allure-playwright) are installed
+                sh 'npm install --include=dev'
             }
         }
 
@@ -22,8 +23,8 @@ pipeline {
             steps {
                 sh 'rm -rf allure-results'
                 sh 'mkdir -p allure-results'
-                // Explicitly pass the allure-playwright reporter
-                sh 'npx playwright test --reporter=line,allure-playwright || true'
+                // Run tests using reporters defined in playwright.config.ts
+                sh 'npx playwright test || true'
                 sh 'ls -la allure-results'
             }
         }
