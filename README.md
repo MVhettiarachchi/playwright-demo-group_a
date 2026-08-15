@@ -1,85 +1,134 @@
-# Playwright API Automation - Demo
+# API Automation Test Suite (Playwright & TypeScript)
 
-This repository contains a small Playwright-based API automation sample used to test an admin users endpoint.
-
-## Purpose
-
-- Provide a clear example of structuring API tests with Playwright's `@playwright/test` fixtures.
-- Centralize HTTP calls in a client class and reuse helpers for validation.
-
-## Repository Structure
-
-- `playwright.config.ts` - Playwright configuration (testDir, reporter, timeouts).
-- `src/client/api_client.ts` - `ApiClient` class: wrapper for API calls (`login`, `getProfile`, `getUsers`).
-- `src/fixtures/api_fixture.ts` - fixture that creates `apiClient` for tests.
-- `src/helper/api_helper.ts` - helper utilities (response validation and parsing).
-- `src/config/config.ts` - base URL and default credentials used by tests.
-- `src/environment/state.ts` - simple in-memory storage for sharing state (e.g., token).
-- `tests/` - Playwright test files. Example: `tests/users.api.test.spec.ts`.
-
-## How to Run
-
-1. From the project root (`D:\qa_automation\playwright-demo`) install dependencies:
-
-```powershell
-npm install
-npx playwright install
-```
-
-2. Run all tests:
-
-```powershell
-npx playwright test
-```
-
-3. Run a single test file:
-
-```powershell
-npx playwright test tests/users.api.test.spec.ts
-```
-
-## How Tests Are Organized
-
-- Tests receive `apiClient` from the fixture in `src/fixtures/api_fixture.ts`.
-- `ApiClient` keeps requests consistent by using Playwright's `APIRequestContext` with `baseURL` from `src/config/config.ts`.
-- `ApiHelper.validateAndParse(response, expectedStatus)` asserts the response status and returns parsed JSON.
-
-## Where to Add Explanations
-
-Add project-specific notes or explanations under the sections below — keep entries short and focused.
-
-### Clients
-
-- Document why methods exist, expected request/response shapes, and any authentication behavior.
-
-### Fixtures
-
-- Describe custom fixtures and their lifetimes (per-test, per-worker), and how they should be used.
-
-### Helpers
-
-- Record shared utilities and common assertions used across tests.
-
-### Tests
-
-- For each test file, add a short summary of the scenarios covered and any required test data or setup.
-
-## Coding & Style Notes
-
-- Keep HTTP interactions inside `ApiClient`.
-- Use `ApiHelper` for reusable assertions and parsing.
-- Prefer small, focused tests that assert one behavior per test.
-
-## Troubleshooting
-
-- "No tests found": ensure you run `npx playwright test` from the project root and that `playwright.config.ts` points to `./tests`.
-- "Cannot find package '@playwright/test'": run `npm install` in the project root.
-
-## Next Steps (Suggestions)
-
-- Add more tests for create/update/delete user flows.
-- Enhance assertions to validate specific fields returned by `admin/users`.
+A robust API testing framework built with **Playwright**, **TypeScript**, and **Allure Reporting**, integrated into a **Jenkins CI/CD** pipeline. This framework utilizes a Page Object/Domain Client model backed by custom Playwright fixtures to validate authentication, user management, exam creation, and Excel bulk upload workflows.
 
 ---
 
-Edit this file to add more project-specific documentation and explanations for future maintainers.
+## 📊 Latest Execution Summary
+
+* **Execution Platform:** Jenkins CI/CD (`api-automation-playwright-group-a`)
+* **Total Tests:** 33
+* **Pass Rate:** 100% (33 Passed, 0 Failed)
+* **Reporting:** Allure Interactive Dashboard
+
+### Test Suites Overview
+
+| Test Suite | Description | Test Count | Result |
+| --- | --- | --- | --- |
+| **Exam API - Full E2E Workflow** | End-to-end exam creation, mark assignments, and verification | 8 | ✅ Pass |
+| **GET /api/admin/exam-marks** | Parametrized search, filtering, and authorization validation | 7 | ✅ Pass |
+| **User Deactivation API Tests** | User status updates (`active` / `inactive`) | 5 | ✅ Pass |
+| **Update User Profile API Tests** | Modifying user metadata and administrative profile controls | 4 | ✅ Pass |
+| **POST /api/admin/exam-marks/import** | Excel buffer upload validation and file handling | 3 | ✅ Pass |
+| **Sample API - Profile Management** | User profile fetching and sanity checks | 2 | ✅ Pass |
+| **Sample API - Authentication** | Token acquisition and login verification | 1 | ✅ Pass |
+| **Sample API - Active User Management** | Status endpoint checks | 1 | ✅ Pass |
+| **Admin Management - User Creation** | Provisioning new user entities | 1 | ✅ Pass |
+| **Other Core Suites** | Helper utilities and security checks | 1 | ✅ Pass |
+
+---
+
+## 🏗️ Framework Architecture
+
+```
+playwright-demo/
+├── src/
+│   ├── client/           # Domain API clients (ApiClient, UserClient, ExamClient, AuthClient)
+│   ├── data/             # Test payloads, JSON mock data, and parameter maps
+│   ├── environment/      # Base URLs, credentials, and configuration
+│   ├── fixtures/         # Dependency injection fixtures (api_fixture.ts)
+│   └── helper/           # Dynamic Excel generation and response validators
+└── tests/                # Feature test spec files (*.spec.ts)
+
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+
+* **Node.js** (v18 or higher)
+* **npm** (v9 or higher)
+
+### 2. Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone <repository-url>
+cd playwright-demo
+npm install
+
+```
+
+---
+
+## 💻 Running Tests
+
+### Run All Test Specs
+
+```bash
+npx playwright test
+
+```
+
+### Run a Specific Test Suite
+
+```bash
+npx playwright test tests/bulk-upload.api.spec.ts
+
+```
+
+### Run Tests by Title Keyword
+
+```bash
+npx playwright test -g "Bulk Upload"
+
+```
+
+### Interactive UI / Debug Mode
+
+```bash
+npx playwright test --ui
+
+```
+
+---
+
+## 📈 Reporting & CI/CD Integration
+
+### Playwright Built-in HTML Report
+
+To view the standard Playwright report locally:
+
+```bash
+npx playwright show-report
+
+```
+
+### Allure Reporting (Local)
+
+Generate and open the Allure interactive dashboard locally:
+
+```bash
+# Generate Allure results
+npx allure generate allure-results --clean -o allure-report
+
+# Open interactive dashboard
+npx allure open allure-report
+
+```
+
+### Jenkins Pipeline Setup
+
+This suite runs automatically on Jenkins build triggers:
+
+1. Jenkins executes `npx playwright test`.
+2. Playwright outputs results to `allure-results/`.
+3. The Jenkins Allure plugin aggregates metrics and publishes the dashboard at `/job/api-automation-playwright-group-a/<build_id>/allure/`.
+
+
+
+<img width="953" height="493" alt="image" src="https://github.com/user-attachments/assets/fc56d6cb-0c60-4649-ba39-cb9e5d181212" />
+
